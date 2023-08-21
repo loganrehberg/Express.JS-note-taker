@@ -1,3 +1,11 @@
+const express = require('express');
+const fs = require('fs');
+const app = express();
+const PORT = 3000;
+
+//Middleware to parse JsON requests
+app.use(express.json());
+
 let noteTitle;
 let noteText;
 let saveNoteBtn;
@@ -24,6 +32,18 @@ const hide = (elem) => {
 
 // activeNote is used to keep track of the note in the textarea
 let activeNote = {};
+
+app.get('/api/notes', (req, res) => {
+  fs.readFile('db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.log('error reading file:', err);
+      return res.status(500).json({ error: "Internal server error"});
+    }
+
+    const notes = JSON.parse(data).notes;
+    res.json(notes);
+  });
+});
 
 const getNotes = () =>
   fetch('/api/notes', {
